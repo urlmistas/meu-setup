@@ -133,7 +133,7 @@ function App({cloud}){
   }
  }
  return <>
-  <header><div className="shell masthead"><div className="brand">setup.<small>Planejador de compras</small></div><div className="masthead-actions"><Button variant="outline" disabled={savingSetup} onClick={()=>setBudgetEditor(true)}><Wallet size={16}/> Meta {money.format(budget)}</Button>{cloud&&<Button variant="ghost" onClick={cloud.signOut}>Sair do espaço</Button>}</div></div></header>
+  <header><div className="shell masthead"><div className="brand">setup.<small>Planejador de compras</small></div><div className="masthead-actions"><Button className="desktop-budget" variant="outline" disabled={savingSetup} onClick={()=>setBudgetEditor(true)}><Wallet size={16}/> Meta {money.format(budget)}</Button>{cloud&&<Button variant="ghost" onClick={cloud.signOut}>Sair do espaço</Button>}</div></div></header>
   <main className="shell">
    <section className="intro">
     <div><h1>Seu setup, um item de cada vez.</h1><p>Organize suas escolhas, defina quando comprar e acompanhe cada conquista.</p></div>

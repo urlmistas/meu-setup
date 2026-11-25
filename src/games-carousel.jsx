@@ -132,7 +132,7 @@ export default function GamesCarousel({cloud}) {
   useEffect(()=>{
     if (!api||games.length<2||!playing||hovered||focused||editor) return
     const timer=window.setInterval(()=>{
-      if (document.hidden||window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+      if (document.hidden||window.matchMedia('(max-width: 620px), (prefers-reduced-motion: reduce)').matches) return
       if (api.canScrollNext()) api.scrollNext()
       else api.scrollTo(0)
     },6500)
@@ -157,7 +157,9 @@ export default function GamesCarousel({cloud}) {
         <Button className="add-game" onClick={()=>openEditor(newGame)}><Plus size={16}/> Adicionar jogo</Button>
       </div>
     </div>
-    {games.length>0?<div className="games-viewport" ref={viewport}>
+    {games.length>0?<div className="games-carousel-frame">
+      {games.length>1&&<Button className="mobile-games-arrow mobile-games-previous" variant="ghost" aria-label="Jogo anterior" onClick={()=>move(-1)}><ChevronLeft size={19}/></Button>}
+      <div className="games-viewport" ref={viewport}>
       <div className="games-slides">
         {games.map((game,index)=><div className="game-slide" key={game.id} role="group"
           aria-roledescription="slide" aria-label={`${index+1} de ${games.length}`}>
@@ -174,7 +176,8 @@ export default function GamesCarousel({cloud}) {
         </div>)}
       </div>
     </div>
-    :<Empty title="Nenhum jogo cadastrado" description="Use Adicionar jogo para começar."/>}
+      {games.length>1&&<Button className="mobile-games-arrow mobile-games-next" variant="ghost" aria-label="Próximo jogo" onClick={()=>move(1)}><ChevronRight size={19}/></Button>}
+    </div>:<Empty title="Nenhum jogo cadastrado" description="Use Adicionar jogo para começar."/>}
     {games.length>0&&<p className="games-note">O 1% low ajuda a entender as quedas de FPS. Os testes usaram configurações diferentes. Com o Ryzen 5 7600, o desempenho pode variar.</p>}
   </section>
   <Modal open={!!editor} onClose={()=>{if (!saving) setEditor(null)}} title={removing?'Remover jogo':editor?.id?'Editar jogo':'Adicionar jogo'}>
