@@ -423,9 +423,22 @@ footer { font-size: 12px }
 .mobile-games-arrow.button { display: none }
 @media (max-width: 620px) {
   .masthead-actions .desktop-budget, .games-heading .games-actions { display: none }
-  .games-carousel-frame { display: grid; grid-template-columns: auto minmax(0,1fr) auto; align-items: center; gap: 2px }
-  .games-carousel-frame .games-viewport { grid-column: 2 }
-  .mobile-games-arrow.button { display: inline-flex; min-height: 44px; width: 36px; padding: 0; border: 0 }
-  .mobile-games-previous { grid-column: 1; grid-row: 1 }
-  .mobile-games-next { grid-column: 3; grid-row: 1 }
+  .games-carousel-frame { position: relative }
+  .mobile-games-arrow.button {
+    position: absolute;
+    z-index: 1;
+    top: 50%;
+    display: inline-flex;
+    min-height: 44px;
+    width: 36px;
+    padding: 0;
+    border: 0;
+    border-radius: 999px;
+    background: var(--panel);
+    color: var(--text);
+    box-shadow: 0 2px 8px #0006;
+  }
+  .mobile-games-arrow.button:hover { background: var(--hover) }
+  .mobile-games-previous { left: 0; translate: -50% -50% }
+  .mobile-games-next { right: 0; translate: 50% -50% }
 }
