@@ -15,9 +15,19 @@ import * as TooltipPrimitive from '@radix-ui/react-tooltip'
 const Calendar = lazy(()=>import('./calendar'))
 const button = cva('button inline-flex items-center justify-center gap-2', {variants:{variant:{default:'primary',outline:'outline',ghost:'ghost'}},defaultVariants:{variant:'default'}})
 
-export function Button({asChild, variant, className='', ...props}) {
+export function Button({asChild, variant, className='', onPointerMove, ...props}) {
   const Component = asChild ? Slot : 'button'
-  return <Component className={button({variant,className})} {...props}/>
+  const tracksLight = variant === undefined || variant === 'default'
+
+  function moveLight(event) {
+    onPointerMove?.(event)
+    if (event.pointerType === 'touch' || event.defaultPrevented) return
+    const bounds = event.currentTarget.getBoundingClientRect()
+    event.currentTarget.style.setProperty('--glass-x', (event.clientX - bounds.left) + 'px')
+    event.currentTarget.style.setProperty('--glass-y', (event.clientY - bounds.top) + 'px')
+  }
+
+  return <Component className={button({variant,className})} onPointerMove={tracksLight ? moveLight : onPointerMove} {...props}/>
 }
 
 export function Input({className='', ...props}) {

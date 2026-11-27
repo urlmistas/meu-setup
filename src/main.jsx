@@ -1,6 +1,6 @@
 import React, {useEffect,useState} from 'react'
 import {createRoot} from 'react-dom/client'
-import {ArrowUpRight as ExternalLink, Edit03 as Pencil, Calendar, Check, Image01, Plus, SearchMd as Search, Wallet02 as Wallet} from '@untitledui/icons'
+import {ArrowUpRight as ExternalLink, Edit03 as Pencil, Calendar, Check, Image01, LogOut01, Plus, SearchMd as Search} from '@untitledui/icons'
 import {Button,Input,Modal,Tooltip,TooltipProvider,Badge,Empty,Progress,Tabs,SelectField,DateField,Toaster,toast} from './ui'
 import '@fontsource-variable/inter'
 import {freshSetup,loadSetup,storeSetup} from './setup-data'
@@ -35,10 +35,9 @@ function App({cloud}){
  const [editor,setEditor]=useState(null)
  const [savingPart,setSavingPart]=useState(false)
  const [partError,setPartError]=useState('')
- const [budgetEditor,setBudgetEditor]=useState(false)
  const [storageError,setStorageError]=useState('')
  const [savingSetup,setSavingSetup]=useState(false)
- const {parts,budget}=data
+ const {parts}=data
  useEffect(()=>{if(!cloud){try{storeSetup(data)}catch{setStorageError('O navegador bloqueou o salvamento das alterações.')}}},[data,cloud])
  const pendingParts=parts.filter(part=>!part.bought)
  const completed=parts.length-pendingParts.length
@@ -74,15 +73,6 @@ function App({cloud}){
    ...item,bought:true,researching:false,boughtDate:today()
   }:item)
   if(await persistSetup({...data,parts:updatedParts})) toast.add({title:'Item comprado',description:part.name})
- }
-
- async function saveBudget(event) {
-  event.preventDefault()
-  const value=Number(new FormData(event.currentTarget).get('budget'))
-  if(await persistSetup({...data,budget:value})) {
-   setBudgetEditor(false)
-   toast.add({title:'Meta atualizada'})
-  }
  }
 
  function exportLocal() {
@@ -133,7 +123,7 @@ function App({cloud}){
   }
  }
  return <>
-  <header><div className="shell masthead"><div className="brand">setup.<small>Planejador de compras</small></div><div className="masthead-actions"><Button className="desktop-budget" variant="outline" disabled={savingSetup} onClick={()=>setBudgetEditor(true)}><Wallet size={16}/> Meta {money.format(budget)}</Button>{cloud&&<Button variant="ghost" onClick={cloud.signOut}>Sair do espaço</Button>}</div></div></header>
+  <header><div className="shell masthead"><div className="brand">setup.<small>Planejador de compras</small></div><div className="masthead-actions">{cloud&&<Button variant="ghost" onClick={cloud.signOut}><LogOut01 size={16} aria-hidden="true"/> Sair do espaço</Button>}</div></div></header>
   <main className="shell">
    <section className="intro">
     <div><h1>Seu setup, um item de cada vez.</h1><p>Organize suas escolhas, defina quando comprar e acompanhe cada conquista.</p></div>
@@ -237,13 +227,6 @@ function App({cloud}){
    {(partError||(cloud&&storageError))&&<div role="alert" data-slot="alert">{partError||storageError}</div>}
    <div className="form-actions"><Button type="button" variant="outline" disabled={savingPart} onClick={()=>setEditor(null)}>Cancelar</Button><Button type="submit" disabled={savingPart}>{savingPart?'Salvando…':'Salvar peça'}</Button></div>
   </form>}</Modal>
-  <Modal open={budgetEditor} onClose={()=>{if(!savingSetup) setBudgetEditor(false)}} title="Editar meta">
-   <form onSubmit={saveBudget}>
-    <label>Meta de gasto (R$)<Input name="budget" type="number" min="0" step=".01" required defaultValue={budget}/></label>
-    {storageError&&<div role="alert" data-slot="alert">{storageError}</div>}
-    <div className="form-actions"><Button type="submit" disabled={savingSetup}>Salvar meta</Button></div>
-   </form>
-  </Modal>
  </>
 }
 createRoot(document.getElementById('root')).render(<TooltipProvider delayDuration={280} skipDelayDuration={350}><Toaster>{supabase&&!new URLSearchParams(location.search).has('local')?<CloudGate>{cloud=><App key={cloud.imported?'imported':'account'} cloud={cloud}/>}</CloudGate>:<App/>}</Toaster></TooltipProvider>)

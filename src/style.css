@@ -26,7 +26,6 @@ header{border-bottom:1px solid var(--line);background:var(--panel)}
 .brand{display:flex;align-items:center;gap:11px;font-weight:730;letter-spacing:-.02em}
 .brand span,.part-icon{display:grid;place-items:center;border-radius:9px;background:var(--accent-surface);color:var(--accent);width:36px;height:36px;flex:none}
 .button{font-size:14px;font-weight:650;border:1px solid transparent;min-height:38px;border-radius:8px;padding:0 13px;white-space:nowrap}
-.primary{background:var(--accent);color:var(--canvas)}.primary:hover{background:var(--accent-soft)}
 .outline{border-color:var(--line);background:var(--panel);color:var(--accent-soft)}.outline:hover,.ghost:hover{background:var(--hover)}
 .ghost{color:var(--muted)}
 .intro{padding:48px 0 24px}
@@ -368,16 +367,12 @@ footer { font-size: 12px }
 .progress-pending { margin-top: 8px }
 .progress-pending h3 { color: var(--text); font-size: 11px; font-weight: 650 }
 .progress-pending .progress-dot { flex: 0 0 8px }
-.games-actions .add-game { background: #6939b6; color: #fff }
-.games-actions .add-game:hover { background: #7646c5 }
 .games-actions .games-arrow { border: 0; background: transparent }
 .games-actions .games-arrow:hover { background: var(--hover); color: var(--text) }
 .game-result-heading .edit-game { background: #353536; color: #e2e2e2; border-color: #535355 }
 .game-result-heading .edit-game:hover { background: #4b4b4d; color: #fff }
 .form-actions .remove-game { color: #f1a1a1; margin-right: auto }
 .form-actions .remove-game:hover { background: #412323 }
-.form-actions .confirm-remove-game { background: #9d343c; color: #fff }
-.form-actions .confirm-remove-game:hover { background: #b13e47 }
 
 .image-attachment-field { display: grid; gap: 7px; min-width: 0 }
 .image-attachment-field legend { margin-bottom: 6px; font-size: 14px; color: var(--text) }
@@ -422,7 +417,7 @@ footer { font-size: 12px }
 
 .mobile-games-arrow.button { display: none }
 @media (max-width: 620px) {
-  .masthead-actions .desktop-budget, .games-heading .games-actions { display: none }
+  .games-heading .games-actions { display: none }
   .games-carousel-frame { position: relative }
   .mobile-games-arrow.button {
     position: absolute;
@@ -442,3 +437,47 @@ footer { font-size: 12px }
   .mobile-games-previous { left: 0; translate: -50% -50% }
   .mobile-games-next { right: 0; translate: 50% -50% }
 }
+
+.button.primary {
+  --glass-light: #7950c8;
+  --glass-dark: #48298d;
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  color: #fff;
+  background: linear-gradient(115deg, color-mix(in srgb, var(--glass-dark) 90%, transparent), var(--glass-light));
+  box-shadow: inset 0 1px 0 #fff5, inset 0 -1px 0 #0003;
+  backdrop-filter: blur(14px) saturate(150%);
+}
+.button.primary.confirm-remove-game { --glass-light: #a33545; --glass-dark: #641e2d }
+.button.primary::before,
+.button.primary::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  pointer-events: none;
+  transition: opacity 280ms var(--ease-out);
+}
+.button.primary::before {
+  background: linear-gradient(135deg, var(--glass-light), var(--glass-dark));
+}
+.button.primary::after {
+  opacity: 0;
+  background:
+    radial-gradient(105px circle at var(--glass-x, 50%) var(--glass-y, 50%), #fff4, transparent 72%),
+    linear-gradient(105deg, transparent, #fff4, transparent);
+  background-repeat: no-repeat;
+  background-size: 100% 100%, 38% 100%;
+  background-position: 0 0, -65% 0;
+}
+.button.primary:is(:hover, :focus-visible):not(:disabled) {
+  box-shadow: inset 0 0 0 1px #e5d7ff80, inset 0 2px 2px #fff5, inset 0 -2px 2px #fff3;
+}
+.button.primary:is(:hover, :focus-visible):not(:disabled)::before { opacity: 0 }
+.button.primary:is(:hover, :focus-visible):not(:disabled)::after {
+  opacity: 1;
+  animation: primary-shine 650ms var(--ease-out);
+}
+@keyframes primary-shine { to { background-position: 0 0, 160% 0 } }
