@@ -129,6 +129,7 @@ header { border: 0; background: transparent; box-shadow: none }
 .brand { gap: 14px; font-size: 25px; color: var(--accent); letter-spacing: -.045em }
 .brand small { border-left: 1px solid var(--border); padding-left: 12px; color: var(--muted); font-size: 11px; font-weight: 500; letter-spacing: 0; text-transform: uppercase }
 .masthead .button { min-height: 32px; font-size: 12px }
+.masthead .sign-out:is(:hover, :focus-visible) { color: #ff8585 }
 .intro { padding: 4px 0 26px }
 .intro h1 { font-size: clamp(27px, 3vw, 36px); letter-spacing: -.035em }
 .intro .button { min-height: 46px }

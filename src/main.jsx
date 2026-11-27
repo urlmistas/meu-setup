@@ -10,7 +10,7 @@ import {supabase} from './cloud'
 import ImageAttachment,{resolveImageAttachment} from './image-attachment'
 import './style.css'
 
-const categories=['Fonte','Gabinete','Placa de vídeo','Processador','Placa-mãe','Memória','SSD','Cooler','Mouse','Mousepad','Monitor','Outros']
+const categories=['Fonte','Gabinete','Placa de vídeo','Processador','Placa-mãe','Memória','SSD','Cooler','Teclado','Mouse','Mousepad','Monitor','Outros']
 const empty={category:'Fonte',name:'',details:'',price:null,bought:false,url:''}
 const money=new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'})
 const statuses={pending:'A comprar',research:'Pesquisando',bought:'Comprado'}
@@ -48,8 +48,9 @@ function App({cloud}){
  const normalized=query.trim().toLocaleLowerCase('pt-BR')
  const matching=parts.filter(p=>[p.name,p.category,p.details].some(value=>value?.toLocaleLowerCase('pt-BR').includes(normalized)))
  const visible=matching.filter(p=>filter==='all'||statusOf(p)===filter)
- const upcoming=[...pendingParts].sort((a,b)=>(a.dueDate||'9999').localeCompare(b.dueDate||'9999')||
-  priorities.indexOf(a.priority||'Baixa')-priorities.indexOf(b.priority||'Baixa')).slice(0,2)
+ const upcoming=[...pendingParts].sort((a,b)=>
+  priorities.indexOf(a.priority||'Baixa')-priorities.indexOf(b.priority||'Baixa')||
+  (a.dueDate||'9999').localeCompare(b.dueDate||'9999')).slice(0,2)
 
  async function persistSetup(updated) {
   if (savingSetup) return false
@@ -123,7 +124,7 @@ function App({cloud}){
   }
  }
  return <>
-  <header><div className="shell masthead"><div className="brand">setup.<small>Planejador de compras</small></div><div className="masthead-actions">{cloud&&<Button variant="ghost" onClick={cloud.signOut}><LogOut01 size={16} aria-hidden="true"/> Sair do espaço</Button>}</div></div></header>
+  <header><div className="shell masthead"><div className="brand">setup.<small>Planejador de compras</small></div><div className="masthead-actions">{cloud&&<Button className="sign-out" variant="ghost" onClick={cloud.signOut}><LogOut01 size={16} aria-hidden="true"/> Sair do espaço</Button>}</div></div></header>
   <main className="shell">
    <section className="intro">
     <div><h1>Seu setup, um item de cada vez.</h1><p>Organize suas escolhas, defina quando comprar e acompanhe cada conquista.</p></div>
