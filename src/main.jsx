@@ -149,9 +149,9 @@ function App({cloud}){
      <thead role="rowgroup"><tr role="row">{['Item / Categoria','Status','Prioridade','Comprar até','Valor previsto','Comprado em','Ações'].map(label=><th role="columnheader" key={label} scope="col">{label}</th>)}</tr></thead>
      <tbody role="rowgroup">{visible.map(p=>{
       const status=statusOf(p)
-      return <tr role="row" key={p.id}>
+      return <tr role="row" key={p.id} className={p.bought ? 'part-bought' : undefined}>
        <td role="cell" className="part"><div className="part-identity"><PartImage image={p.image}/><div><strong>{p.name}</strong><small>{p.category}{p.details?' · '+p.details:''}</small></div></div></td>
-       <td role="cell"><Badge variant={status}>{statuses[status]}</Badge></td>
+       <td role="cell"><Badge variant={status}>{p.bought && <Check size={12} aria-hidden="true"/>}{statuses[status]}</Badge></td>
        <td role="cell" data-label="Prioridade" className={!p.bought&&p.priority==='Alta'?'high':''}>{p.bought?'Concluída':(p.priority||'—')}</td>
        <td role="cell" data-label="Comprar até">{p.bought?'—':showDate(p.dueDate)}</td>
        <td role="cell" data-label="Valor previsto" className="price">{showPrice(p.price)}</td>
