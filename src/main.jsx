@@ -5,7 +5,6 @@ import {Button,Input,Modal,Tooltip,TooltipProvider,Badge,Empty,Progress,Tabs,Sel
 import '@fontsource-variable/inter'
 import {freshSetup,loadSetup,storeSetup} from './setup-data'
 import GamesCarousel,{loadGames} from './games-carousel'
-import PcBuild from './pc-build'
 import CloudGate from './cloud-gate'
 import {supabase} from './cloud'
 import ImageAttachment,{resolveImageAttachment} from './image-attachment'
@@ -206,7 +205,6 @@ function App({cloud}){
      </div>:parts.length>0&&<p>Todas as peças foram compradas.</p>}
     </article>
    </section>
-   <PcBuild parts={parts}/>
    <GamesCarousel cloud={cloud}/>
    <footer>{(storageError||cloud?.accountError)&&<div role="alert" data-slot="alert">{storageError||cloud.accountError}</div>}
     <div className="footer-storage"><span>{cloud?'Salvamento no espaço compartilhado.':'Dados salvos neste navegador.'}</span>
