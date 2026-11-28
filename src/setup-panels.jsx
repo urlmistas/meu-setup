@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { ArrowUpRight } from '@untitledui/icons'
+import { ArrowUpRight, RefreshCw01 } from '@untitledui/icons'
 import { Button, Progress } from './ui'
 import './setup-panels.css'
 
@@ -17,10 +17,15 @@ const steps = [
 const currency = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' })
 const timestamp = new Intl.DateTimeFormat('pt-BR', { dateStyle: 'short', timeStyle: 'short', timeZone: 'America/Sao_Paulo' })
 const money = cents => currency.format(cents / 100)
+const assemblyCategories = new Set(['Gabinete', 'Fonte', 'Placa-mãe', 'Processador', 'Cooler', 'Memória', 'SSD', 'Placa de vídeo', 'Ventoinha'])
 
-export function AssemblyChecklist({ value, saving, onChange }) {
+export function AssemblyChecklist({ parts, value, saving, onChange }) {
   const checked = Array.isArray(value) ? new Set(value) : new Set()
   const count = steps.filter(([id]) => checked.has(id)).length
+  const assemblyParts = parts.filter(part => assemblyCategories.has(part.category))
+  const missing = assemblyParts.filter(part => !part.bought)
+  const locked = !assemblyParts.length || missing.length > 0
+  const bought = assemblyParts.length - missing.length
   const [failed, setFailed] = useState(false)
 
   async function toggle(id, done) {
@@ -32,15 +37,23 @@ export function AssemblyChecklist({ value, saving, onChange }) {
   return <section className="setup-panel assembly-panel" aria-labelledby="assembly-title">
     <div className="setup-panel-heading">
       <h2 id="assembly-title">Checklist de montagem</h2>
-      <span>{count} de {steps.length} etapas</span>
+      <span>{locked ? `${bought} de ${assemblyParts.length} peças` : `${count} de ${steps.length} etapas`}</span>
     </div>
-    <Progress label="Progresso da montagem" value={count / steps.length * 100}/>
-    <ul className="assembly-steps">
-      {steps.map(([id, label]) => <li key={id}>
-        <label><input type="checkbox" checked={checked.has(id)} disabled={saving} onChange={event => toggle(id, event.target.checked)}/><span>{label}</span></label>
-      </li>)}
-    </ul>
-    {failed && <p role="alert">A etapa não foi salva. Confira o aviso no fim da página.</p>}
+    {locked ? <>
+      <Progress label="Peças compradas para a montagem" value={assemblyParts.length ? bought / assemblyParts.length * 100 : 0}/>
+      {missing.length ? <>
+        <p className="assembly-lock">{missing.length === 1 ? 'Falta 1 peça' : `Faltam ${missing.length} peças`} para liberar a checklist.</p>
+        <ul className="assembly-missing">{missing.map(part => <li key={part.id}>{part.name}</li>)}</ul>
+      </> : <p className="assembly-lock">Cadastre as peças do PC para acompanhar o que falta para montar.</p>}
+    </> : <>
+      <Progress label="Progresso da montagem" value={count / steps.length * 100}/>
+      <ul className="assembly-steps">
+        {steps.map(([id, label]) => <li key={id}>
+          <label><input type="checkbox" checked={checked.has(id)} disabled={saving} onChange={event => toggle(id, event.target.checked)}/><span>{label}</span></label>
+        </li>)}
+      </ul>
+      {failed && <p role="alert">A etapa não foi salva. Confira o aviso no fim da página.</p>}
+    </>}
   </section>
 }
 
@@ -71,7 +84,7 @@ export function OfferRadar({ parts, readRadar }) {
       {readRadar && <Button variant="ghost" disabled={state.status === 'loading'} onClick={() => {
         setState(previous => ({ ...previous, status: 'loading' }))
         setRefresh(value => value + 1)
-      }}>Atualizar</Button>}
+      }}><RefreshCw01 size={14} aria-hidden="true"/>Atualizar</Button>}
     </div>
     {!readRadar ? <p>Abra o espaço compartilhado para consultar os preços do monitor.</p> : <>
       <p>Preços anunciados. Confira estoque, Pix e frete na loja.</p>

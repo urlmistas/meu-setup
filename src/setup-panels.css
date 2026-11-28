@@ -5,6 +5,8 @@
 .setup-panel-heading span, .setup-panel p { color: var(--muted); font-size: 12px }
 .setup-panel-heading .button { min-height: 28px; padding-inline: 8px; font-size: 12px }
 .setup-panel [role="alert"] { color: #ffabab; margin-top: 8px }
+.assembly-panel .assembly-lock { margin-top: 9px }
+.assembly-missing { display: grid; gap: 5px; margin-top: 9px; padding-left: 18px; list-style: circle; font-size: 13px; overflow-wrap: anywhere }
 .assembly-steps, .radar-items { margin-top: 12px }
 .assembly-steps label { display: flex; align-items: center; gap: 9px; font-size: 13px; min-height: 34px; cursor: pointer }
 .assembly-steps input { flex: none; width: 16px; height: 16px; accent-color: var(--accent); cursor: pointer }

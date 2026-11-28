@@ -11,7 +11,7 @@ import {supabase} from './cloud'
 import ImageAttachment,{resolveImageAttachment} from './image-attachment'
 import './style.css'
 
-const categories=['Fonte','Gabinete','Placa de vídeo','Processador','Placa-mãe','Memória','SSD','Cooler','Teclado','Mouse','Mousepad','Monitor','Outros']
+const categories=['Fonte','Gabinete','Placa de vídeo','Processador','Placa-mãe','Memória','SSD','Cooler','Ventoinha','Teclado','Mouse','Mousepad','Monitor','Outros']
 const empty={category:'Fonte',name:'',details:'',price:null,bought:false,url:''}
 const money=new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'})
 const statuses={pending:'A comprar',research:'Pesquisando',bought:'Comprado'}
@@ -208,7 +208,7 @@ function App({cloud}){
    </section>
    <div className="setup-panels">
     <OfferRadar parts={pendingParts} readRadar={cloud?.readRadar}/>
-    <AssemblyChecklist value={data.assemblyChecklist} saving={savingSetup}
+    <AssemblyChecklist parts={parts} value={data.assemblyChecklist} saving={savingSetup}
      onChange={assemblyChecklist=>persistSetup({...data,assemblyChecklist})}/>
    </div>
    <GamesCarousel cloud={cloud}/>
