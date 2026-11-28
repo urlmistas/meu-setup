@@ -6,6 +6,8 @@ import '@fontsource-variable/inter'
 import {freshSetup,loadSetup,storeSetup} from './setup-data'
 import GamesCarousel,{loadGames} from './games-carousel'
 import { AssemblyChecklist, OfferRadar } from './setup-panels'
+import { PurchaseFields, PurchasePanels } from './purchase-panels'
+import { deliveryLabels, logChange, readList } from './purchase-data'
 import CloudGate from './cloud-gate'
 import {supabase} from './cloud'
 import ImageAttachment,{resolveImageAttachment} from './image-attachment'
@@ -34,18 +36,21 @@ function App({cloud}){
  const [filter,setFilter]=useState('all')
  const [query,setQuery]=useState('')
  const [editor,setEditor]=useState(null)
+ const [editingUpgrade,setEditingUpgrade]=useState(false)
+ const [radar,setRadar]=useState({})
  const [savingPart,setSavingPart]=useState(false)
  const [partError,setPartError]=useState('')
  const [storageError,setStorageError]=useState('')
  const [savingSetup,setSavingSetup]=useState(false)
  const {parts}=data
+ const upgrades=readList(data.upgrades)
  useEffect(()=>{if(!cloud){try{storeSetup(data)}catch{setStorageError('O navegador bloqueou o salvamento das alterações.')}}},[data,cloud])
  const pendingParts=parts.filter(part=>!part.bought)
  const completed=parts.length-pendingParts.length
  const progress=parts.length?Math.round(completed/parts.length*100):0
  const sum=list=>list.reduce((total,p)=>total+Math.round((p.price??0)*100),0)/100
  const planned=sum(pendingParts)
- const spent=sum(parts.filter(p=>p.bought).map(p=>({...p,price:p.paidPrice??p.price})))
+ const spent=sum(parts.filter(p=>p.bought).map(p=>({...p,price:p.paidPrice})))
  const normalized=query.trim().toLocaleLowerCase('pt-BR')
  const matching=parts.filter(p=>[p.name,p.category,p.details].some(value=>value?.toLocaleLowerCase('pt-BR').includes(normalized)))
  const visible=matching.filter(p=>filter==='all'||statusOf(p)===filter)
@@ -53,8 +58,9 @@ function App({cloud}){
   priorities.indexOf(a.priority||'Baixa')-priorities.indexOf(b.priority||'Baixa')||
   (a.dueDate||'9999').localeCompare(b.dueDate||'9999')).slice(0,2)
 
- async function persistSetup(updated) {
+ async function persistSetup(updated, change) {
   if (savingSetup) return false
+  if (change) updated=logChange(updated,...change)
   setSavingSetup(true)
   try {
    if(cloud) await cloud.saveSetup(updated)
@@ -72,9 +78,9 @@ function App({cloud}){
 
  async function markBought(part) {
   const updatedParts=parts.map(item=>item.id===part.id?{
-   ...item,bought:true,researching:false,boughtDate:today()
+   ...item,bought:true,researching:false,boughtDate:today(),purchase:{...item.purchase,delivery:'awaiting'}
   }:item)
-  if(await persistSetup({...data,parts:updatedParts})) toast.add({title:'Item comprado',description:part.name})
+  if(await persistSetup({...data,parts:updatedParts},['Item comprado',part.name])) toast.add({title:'Item comprado',description:part.name})
  }
 
  function exportLocal() {
@@ -86,9 +92,17 @@ function App({cloud}){
   link.click()
   setTimeout(()=>URL.revokeObjectURL(url),1000)
  }
- function openPart(part) {
+ function openPart(part, upgrade=false) {
   setPartError('')
+  setEditingUpgrade(upgrade)
   setEditor(part)
+ }
+
+ async function moveUpgrade(part) {
+  const updatedParts=[...parts,{...part,bought:false,researching:false}]
+  if(await persistSetup({...data,parts:updatedParts,upgrades:upgrades.filter(item=>item.id!==part.id)},['Upgrade movido para compras',part.name])) {
+   toast.add({title:'Upgrade na lista de compras',description:part.name})
+  }
  }
 
  async function save(event){
@@ -109,15 +123,25 @@ function App({cloud}){
     setPartError(error.message)
     return
    }
-   const row={...editor,id:editor.id??crypto.randomUUID(),name,image,category:fields.get('category'),details:String(fields.get('details')).trim(),url:String(fields.get('url')).trim(),price:fields.get('price')===''?null:Number(fields.get('price')),bought,researching:status==='research',priority:fields.get('priority')==='unset'?'':fields.get('priority'),dueDate:fields.get('dueDate'),boughtDate:bought?(fields.get('boughtDate')||(!editor.bought?today():'')):'',paidPrice:fields.get('paidPrice')===''?null:Number(fields.get('paidPrice'))}
-   const updatedParts=editor.id?parts.map(part=>part.id===row.id?row:part):[...parts,row]
-   if(!await persistSetup({...data,parts:updatedParts})) {
-    if(!cloud) setPartError('Não foi possível salvar no navegador. Se você enviou uma imagem, tente um arquivo menor.')
-    return
+   const paidPrice=fields.get('paidPrice')
+   const row={...editor,id:editor.id??crypto.randomUUID(),name,image,category:fields.get('category'),details:String(fields.get('details')).trim(),url:String(fields.get('url')).trim(),price:fields.get('price')===''?null:Number(fields.get('price')),bought,researching:status==='research',priority:fields.get('priority')==='unset'?'':fields.get('priority'),dueDate:fields.get('dueDate')??'',boughtDate:bought?(fields.get('boughtDate')||(!editor.bought?today():'')):'',paidPrice:paidPrice?Number(paidPrice):null}
+   if (bought) {
+    const delivery=fields.get('delivery')
+    row.purchase=Object.fromEntries(['orderUrl','trackingUrl','receiptUrl','returnUntil','warrantyUntil'].map(key=>[key,String(fields.get(key)??'').trim()]))
+    row.purchase.delivery=delivery!=='unset'&&Object.hasOwn(deliveryLabels,delivery)?delivery:editor.bought?'unset':'awaiting'
    }
    let title=editor.id?'Item atualizado':'Item adicionado'
    if (bought&&!editor.bought) title='Item comprado'
    if (!bought&&editor.bought) title='Compra desfeita'
+   if (bought&&editor.bought&&row.purchase.delivery!==(editor.purchase?.delivery||'unset')) title='Entrega: '+deliveryLabels[row.purchase.delivery]
+   if (editingUpgrade) title=editor.id?'Upgrade atualizado':'Upgrade adicionado'
+   const collection=editingUpgrade?'upgrades':'parts'
+   const items=editingUpgrade?upgrades:parts
+   const updated=editor.id?items.map(part=>part.id===row.id?row:part):[...items,row]
+   if(!await persistSetup({...data,[collection]:updated},[title,name])) {
+    if(!cloud) setPartError('Não foi possível salvar no navegador. Se você enviou uma imagem, tente um arquivo menor.')
+    return
+   }
    toast.add({title,description:name})
    setEditor(null)
   } finally {
@@ -207,10 +231,12 @@ function App({cloud}){
     </article>
    </section>
    <div className="setup-panels">
-    <OfferRadar parts={pendingParts} readRadar={cloud?.readRadar}/>
+    <OfferRadar parts={pendingParts} readRadar={cloud?.readRadar} onQuotes={setRadar}/>
     <AssemblyChecklist parts={parts} value={data.assemblyChecklist} saving={savingSetup}
-     onChange={assemblyChecklist=>persistSetup({...data,assemblyChecklist})}/>
+     onChange={(assemblyChecklist, label, done)=>persistSetup({...data,assemblyChecklist},[done?'Etapa concluída':'Etapa reaberta',label])}/>
    </div>
+   <PurchasePanels parts={parts} upgrades={upgrades} activity={readList(data.activity)} radar={radar} cloud={!!cloud}
+    saving={savingSetup} onEdit={openPart} onUpgrade={part=>openPart(part??empty,true)} onMove={moveUpgrade}/>
    <GamesCarousel cloud={cloud}/>
    <footer>{(storageError||cloud?.accountError)&&<div role="alert" data-slot="alert">{storageError||cloud.accountError}</div>}
     <div className="footer-storage"><span>{cloud?'Salvamento no espaço compartilhado.':'Dados salvos neste navegador.'}</span>
@@ -219,20 +245,23 @@ function App({cloud}){
     </div>
    </footer>
   </main>
-  <Modal open={!!editor} onClose={()=>{if(!savingPart) setEditor(null)}} title={editor?.id?'Editar peça':'Adicionar peça'}>{editor&&<form onSubmit={save}>
+  <Modal open={!!editor} onClose={()=>{if(!savingPart) setEditor(null)}} title={editingUpgrade?(editor?.id?'Editar upgrade':'Adicionar upgrade'):(editor?.id?'Editar peça':'Adicionar peça')}>{editor&&<form onSubmit={save}>
    <label>Nome<Input name="name" required maxLength={120} defaultValue={editor.name} onInput={e=>e.currentTarget.setCustomValidity('')}/></label>
    <div className="form-pair"><SelectField name="category" label="Tipo de peça" defaultValue={editor.category} options={Object.fromEntries(categories.map(value=>[value,value]))}/><label>Valor previsto (R$)<Input name="price" type="number" min="0" step="0.01" defaultValue={editor.price??''}/></label></div>
    <label>Modelo, código ou observação<Input name="details" maxLength={180} defaultValue={editor.details}/></label>
    <label>Link da oferta<Input name="url" type="url" pattern="https?://.+" placeholder="https://" defaultValue={editor.url}/></label>
    <div className="form-pair">
-    <SelectField name="status" label="Status" defaultValue={statusOf(editor)} options={statuses}/>
+    {!editingUpgrade&&<SelectField name="status" label="Status" defaultValue={statusOf(editor)} options={statuses}/>}
     <SelectField name="priority" label="Prioridade" defaultValue={editor.priority||'unset'} options={{unset:'A definir',...Object.fromEntries(priorities.map(value=>[value,value]))}}/>
    </div>
-   <div className="form-pair"><DateField name="dueDate" label="Comprar até" defaultValue={editor.dueDate}/><DateField name="boughtDate" label="Comprado em" defaultValue={editor.boughtDate}/></div>
-   <label>Valor pago (R$)<Input name="paidPrice" type="number" min="0" step="0.01" defaultValue={editor.paidPrice??''}/></label>
+   {!editingUpgrade&&<>
+    <div className="form-pair"><DateField name="dueDate" label="Comprar até" defaultValue={editor.dueDate}/><DateField name="boughtDate" label="Comprado em" defaultValue={editor.boughtDate}/></div>
+    <label>Valor pago (R$)<Input name="paidPrice" type="number" min="0" step="0.01" defaultValue={editor.paidPrice??''}/></label>
+    <details className="purchase-editor-details" open={editor.bought}><summary>Dados da compra</summary><PurchaseFields purchase={editor.purchase}/></details>
+   </>}
    <ImageAttachment label="Imagem da peça" initialImage={editor.image} disabled={savingPart}/>
    {(partError||(cloud&&storageError))&&<div role="alert" data-slot="alert">{partError||storageError}</div>}
-   <div className="form-actions"><Button type="button" variant="outline" disabled={savingPart} onClick={()=>setEditor(null)}>Cancelar</Button><Button type="submit" disabled={savingPart}>{savingPart?'Salvando…':'Salvar peça'}</Button></div>
+   <div className="form-actions"><Button type="button" variant="outline" disabled={savingPart} onClick={()=>setEditor(null)}>Cancelar</Button><Button type="submit" disabled={savingPart}>{savingPart?'Salvando…':editingUpgrade?'Salvar upgrade':'Salvar peça'}</Button></div>
   </form>}</Modal>
  </>
 }
