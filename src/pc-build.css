@@ -1,0 +1,146 @@
+.pc-build {
+  display: grid;
+  grid-template-columns: 1.15fr 1fr;
+  margin: 18px 0;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  overflow: hidden;
+  background: var(--panel);
+}
+.pc-build-stage {
+  position: relative;
+  min-height: 345px;
+  background: radial-gradient(ellipse at 50% 46%, #302449, transparent 66%), #151418;
+  border-right: 1px solid var(--border);
+}
+.pc-build-scene {
+  position: absolute;
+  inset: 0 0 32px;
+  display: grid;
+  place-items: center;
+  perspective: 720px;
+  overflow: hidden;
+}
+.pc-build-shadow {
+  position: absolute;
+  top: 77%;
+  width: 205px;
+  height: 52px;
+  background: #0e0b17;
+  border-radius: 50%;
+  filter: blur(14px);
+}
+.pc-build-tower {
+  position: relative;
+  width: 156px;
+  height: 212px;
+  transform-style: preserve-3d;
+  transform: rotateX(-12deg) rotateY(var(--pc-angle));
+  transition: transform 400ms var(--ease-out);
+}
+.pc-frame { position: absolute; inset: 0; transform-style: preserve-3d }
+.pc-frame i {
+  position: absolute;
+  display: block;
+  border: 1px dashed #aa92e467;
+}
+.pc-frame-back, .pc-frame-front { inset: 0 }
+.pc-frame-back {
+  transform: translateZ(-34px);
+  background: repeating-linear-gradient(0deg, #bca5ff0c 0 1px, transparent 1px 12px), #1d1729;
+}
+.pc-frame-front { transform: translateZ(34px) }
+.pc-frame-top {
+  left: 0;
+  top: -34px;
+  width: 156px;
+  height: 68px;
+  transform: rotateX(90deg);
+}
+.pc-frame-side {
+  top: 0;
+  right: -34px;
+  width: 68px;
+  height: 212px;
+  transform: rotateY(90deg);
+}
+.pc-frame-owned i { border: 2px solid #ad9bd0 }
+.pc-frame-owned .pc-frame-top, .pc-frame-owned .pc-frame-side {
+  background: linear-gradient(130deg, #72638a82, #28213724);
+}
+.pc-frame-owned .pc-frame-front { background: linear-gradient(125deg, #e4d7ff12, transparent 55%) }
+.pc-component {
+  position: absolute;
+  left: var(--part-x);
+  top: var(--part-y);
+  width: var(--part-w);
+  height: var(--part-h);
+  transform: translateZ(var(--part-z));
+  transform-style: preserve-3d;
+  border: 1px solid var(--part-edge);
+  border-radius: 3px;
+  background: var(--part-fill);
+  animation: pc-component-in 270ms var(--ease-out) both;
+}
+.pc-component i {
+  position: absolute;
+  inset: 0 0 auto;
+  height: 8px;
+  transform-origin: top;
+  transform: rotateX(-90deg);
+  background: var(--part-edge);
+  border-radius: 2px;
+}
+.pc-board {
+  --part-x: 16px; --part-y: 20px; --part-w: 118px; --part-h: 140px; --part-z: -26px;
+  --part-edge: #65c5ae;
+  --part-fill: repeating-linear-gradient(90deg, transparent 0 11px, #65c5ae35 11px 12px), #203934;
+}
+.pc-cpu {
+  --part-x: 46px; --part-y: 47px; --part-w: 37px; --part-h: 37px; --part-z: -15px;
+  --part-edge: #eee2ff;
+  --part-fill: linear-gradient(135deg, #e1d6f0, #776289);
+}
+.pc-cooler {
+  --part-x: 39px; --part-y: 40px; --part-w: 51px; --part-h: 51px; --part-z: 1px;
+  --part-edge: #ad95f5;
+  --part-fill: radial-gradient(circle, #c4b2ff 0 14%, transparent 16%), repeating-conic-gradient(#302842 0 23deg, #8271a9 23deg 40deg);
+  border-radius: 50%;
+}
+.pc-ram {
+  --part-x: 98px; --part-y: 32px; --part-w: 21px; --part-h: 65px; --part-z: -11px;
+  --part-edge: #d5b9ff;
+  --part-fill: linear-gradient(90deg, #a586fd 38%, #2a203a 38% 59%, #cab1ff 59%);
+}
+.pc-ssd {
+  --part-x: 55px; --part-y: 104px; --part-w: 53px; --part-h: 12px; --part-z: -17px;
+  --part-edge: #e8bd7b;
+  --part-fill: repeating-linear-gradient(90deg, #483826 0 8px, #786044 8px 10px);
+}
+.pc-gpu {
+  --part-x: 12px; --part-y: 122px; --part-w: 126px; --part-h: 32px; --part-z: 13px;
+  --part-edge: #aebeff;
+  --part-fill: radial-gradient(circle, #aebeff 0 9%, #242741 11% 27%, transparent 30%) 0 0 / 33.33% 100%, linear-gradient(#666eaa, #282c4b);
+}
+.pc-psu {
+  --part-x: 13px; --part-y: 165px; --part-w: 77px; --part-h: 37px; --part-z: 9px;
+  --part-edge: #b5a6cc;
+  --part-fill: repeating-linear-gradient(90deg, #25222d 0 3px, #645772 3px 4px);
+}
+@keyframes pc-component-in {
+  from { opacity: 0; transform: translateZ(calc(var(--part-z) + 26px)) }
+}
+.pc-build-controls { position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%); display: flex; gap: 4px }
+.pc-build-controls .button { min-height: 32px; padding: 0 9px; color: var(--accent-soft); font-size: 12px }
+.pc-build-details { align-self: center; padding: clamp(18px, 3vw, 36px); min-width: 0 }
+.pc-build-details h2 { font-size: 22px; font-weight: 650; letter-spacing: -.035em }
+.pc-build-details p { margin-top: 6px; color: var(--muted); font-size: 13px }
+.pc-build-inventory { margin-top: 18px }
+.pc-build-inventory h3 { margin-top: 14px; font-size: 12px; font-weight: 650 }
+.pc-build-inventory ul { display: grid; gap: 6px; margin-top: 6px }
+.pc-build-inventory li { display: flex; align-items: center; gap: 7px; font-size: 13px; overflow-wrap: anywhere }
+.pc-build-inventory li svg { flex: none; color: #43da82 }
+@media (max-width: 700px) {
+  .pc-build { grid-template-columns: 1fr }
+  .pc-build-stage { min-height: 305px; border-right: 0; border-bottom: 1px solid var(--border) }
+}
