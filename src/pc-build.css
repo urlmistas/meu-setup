@@ -123,10 +123,85 @@
   --part-fill: radial-gradient(circle, #aebeff 0 9%, #242741 11% 27%, transparent 30%) 0 0 / 33.33% 100%, linear-gradient(#666eaa, #282c4b);
 }
 .pc-psu {
-  --part-x: 13px; --part-y: 165px; --part-w: 77px; --part-h: 37px; --part-z: 9px;
-  --part-edge: #b5a6cc;
-  --part-fill: repeating-linear-gradient(90deg, #25222d 0 3px, #645772 3px 4px);
+  --part-x: 12px; --part-y: 165px; --part-w: 91px; --part-h: 37px; --part-z: 19px;
+  --part-edge: #c6b6e6;
+  --part-fill: linear-gradient(135deg, #54476a, #272231 82%);
 }
+.pc-psu i {
+  height: 25px;
+  background: radial-gradient(circle at 32% 50%, #baaad5 0 8%, transparent 10%), repeating-linear-gradient(90deg, #24202c 0 3px, #756588 4px 5px);
+}
+.pc-psu b {
+  position: absolute;
+  inset: 0 -25px 0 auto;
+  width: 25px;
+  transform: rotateY(90deg);
+  transform-origin: left;
+  background: repeating-linear-gradient(0deg, #25212f 0 4px, #675b7a 5px 6px);
+}
+.pc-psu span { position: absolute; left: 8px; bottom: 8px; color: #eee6ff; font: 700 9px Inter, sans-serif; letter-spacing: .12em }
+.pc-case-fans {
+  position: absolute;
+  top: 27px;
+  right: 3px;
+  display: grid;
+  gap: 6px;
+  transform: translateZ(9px);
+}
+.pc-case-fans i {
+  display: block;
+  width: 34px;
+  aspect-ratio: 1;
+  border: 2px solid #a98afa;
+  border-radius: 50%;
+  background: radial-gradient(circle, #cebaff 0 13%, transparent 17%), repeating-conic-gradient(#332846 0 22deg, #75629c 24deg 42deg);
+  box-shadow: 0 0 8px #ad88fb80, inset 0 0 4px #130d20;
+}
+.pc-view-switch { margin-top: 12px; white-space: normal }
+.pc-full-view .pc-build-tower {
+  transform: translate(81px, -2px) rotateX(-12deg) rotateY(var(--pc-angle)) scale(.69);
+}
+.pc-full-view .pc-build-shadow { display: none }
+.pc-desk {
+  position: absolute;
+  width: 272px;
+  height: 190px;
+  transform: translateY(13px);
+}
+.pc-desk::before {
+  content: "";
+  position: absolute;
+  inset: auto 0 4px;
+  height: 63px;
+  border: 1px solid #605076;
+  border-radius: 10px;
+  background: linear-gradient(150deg, #463657, #211b2c);
+  box-shadow: 0 6px #191522, 0 17px 22px #100d18;
+  transform: skewX(-13deg);
+}
+.pc-desk-monitor {
+  position: absolute;
+  top: 21px;
+  left: 9px;
+  width: 137px;
+  height: 79px;
+  border: 4px solid #554b68;
+  border-radius: 6px;
+  background: linear-gradient(150deg, #2e2364, #7152ae 55%, #262044);
+  box-shadow: 3px 3px #181421;
+}
+.pc-desk-monitor i { position: absolute; top: 100%; left: 47%; width: 8px; height: 23px; background: #a08abf }
+.pc-desk-monitor i::after { content: ""; position: absolute; bottom: 0; left: -16px; width: 40px; height: 5px; border-radius: 4px; background: #8975a7 }
+.pc-desk-keyboard, .pc-desk-mousepad, .pc-desk-mouse { position: absolute; transform: skewX(-13deg) }
+.pc-desk-keyboard {
+  top: 144px; left: 10px; width: 103px; height: 24px;
+  border: 3px solid #514765; border-radius: 4px;
+  background: repeating-linear-gradient(0deg, #0000 0 5px, #272032 5px 6px), repeating-linear-gradient(90deg, #a890d3 0 5px, #282331 5px 7px);
+  box-shadow: 0 3px #211a29;
+}
+.pc-desk-mousepad { top: 139px; left: 119px; width: 40px; height: 39px; border: 1px solid #9779c8; border-radius: 4px; background: #241c30 }
+.pc-desk-mouse { top: 145px; left: 131px; width: 16px; height: 25px; border: 1px solid #b7a5d8; border-radius: 8px 8px 6px 6px; background: linear-gradient(120deg, #a98acb, #51415d) }
+.pc-desk-mouse i { display: block; width: 2px; height: 6px; margin: 4px auto; border-radius: 2px; background: #e9d8ff }
 @keyframes pc-component-in {
   from { opacity: 0; transform: translateZ(calc(var(--part-z) + 26px)) }
 }
