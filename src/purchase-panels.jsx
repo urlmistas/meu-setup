@@ -2,15 +2,16 @@ import React, {useEffect, useState} from 'react'
 import {ArrowRight, ArrowUpRight, Edit03, Plus} from '@untitledui/icons'
 import {Button, DateField, Input, SelectField, Tabs} from './ui'
 import {currency, dayKey, deadline, deliveryLabels, formatDateTime, radarChanges, safeLink} from './purchase-data'
+import MonthlyPlan from './monthly-plan'
 import './purchase-panels.css'
 
 const displayMoney = value => Number.isFinite(value) ? currency.format(value) : '—'
 const sum = (rows, field) => rows.reduce((total, row) => total + Math.round(row[field] * 100), 0) / 100
 const panels = [
-  ['spend', 'Gastos'], ['delivery', 'Entregas'], ['warranty', 'Garantias'], ['activity', 'Atividade'], ['upgrades', 'Upgrades'],
+  ['spend', 'Gastos'], ['delivery', 'Entregas'], ['warranty', 'Garantias'], ['activity', 'Atividade'], ['upgrades', 'Upgrades'], ['monthly', 'Plano mensal'],
 ]
 
-export function PurchasePanels({parts, upgrades, activity, radar, cloud, saving, onEdit, onUpgrade, onMove}) {
+export function PurchasePanels({parts, upgrades, activity, radar, cloud, saving, onEdit, onUpgrade, onMove, monthlyLimits, onSaveMonthlyLimits}) {
   const purchased = parts.filter(part => part.bought)
   const visitsKey = 'meu-setup-visit-v1:' + (cloud ? 'shared' : 'local')
   const [previousVisit] = useState(() => {
@@ -31,6 +32,7 @@ export function PurchasePanels({parts, upgrades, activity, radar, cloud, saving,
       <Tabs.Panel value="warranty"><Warranty parts={purchased} onEdit={onEdit}/></Tabs.Panel>
       <Tabs.Panel value="activity"><Activity events={[...activity, ...radarChanges(radar)]} previousVisit={previousVisit}/></Tabs.Panel>
       <Tabs.Panel value="upgrades"><Upgrades items={upgrades} saving={saving} onEdit={onUpgrade} onMove={onMove}/></Tabs.Panel>
+      <Tabs.Panel value="monthly"><MonthlyPlan parts={parts} limits={monthlyLimits} saving={saving} onSave={onSaveMonthlyLimits}/></Tabs.Panel>
     </Tabs.Root>
   </section>
 }

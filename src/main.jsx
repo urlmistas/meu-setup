@@ -236,7 +236,9 @@ function App({cloud}){
      onChange={(assemblyChecklist, label, done)=>persistSetup({...data,assemblyChecklist},[done?'Etapa concluída':'Etapa reaberta',label])}/>
    </div>
    <PurchasePanels parts={parts} upgrades={upgrades} activity={readList(data.activity)} radar={radar} cloud={!!cloud}
-    saving={savingSetup} onEdit={openPart} onUpgrade={part=>openPart(part??empty,true)} onMove={moveUpgrade}/>
+    saving={savingSetup} onEdit={openPart} onUpgrade={part=>openPart(part??empty,true)} onMove={moveUpgrade}
+    monthlyLimits={data.monthlyLimits??undefined}
+    onSaveMonthlyLimits={(monthlyLimits, month)=>persistSetup({...data,monthlyLimits},['Limite mensal atualizado',month])}/>
    <GamesCarousel cloud={cloud}/>
    <footer>{(storageError||cloud?.accountError)&&<div role="alert" data-slot="alert">{storageError||cloud.accountError}</div>}
     <div className="footer-storage"><span>{cloud?'Salvamento no espaço compartilhado.':'Dados salvos neste navegador.'}</span>

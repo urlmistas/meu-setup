@@ -26,6 +26,22 @@
 .offer-estimate label { display: grid; gap: 4px; width: min(170px, 100%); margin: 8px 0 4px }
 .offer-estimate .field { min-height: 32px; width: 100%; font-size: 12px }
 .assembly-missing span { color: var(--muted) }
+.monthly-controls { display: flex; flex-wrap: wrap; gap: 8px; align-items: end; margin: 12px 0 }
+.monthly-controls label { display: grid; gap: 4px; flex: 1 1 150px; max-width: 260px; min-width: 0; font-size: 12px }
+.monthly-controls .field { width: 100%; min-width: 0; min-height: 39px }
+.monthly-controls .button { min-height: 39px; font-size: 12px }
+.monthly-simulation { border: 1px solid var(--line); border-radius: 8px; padding: 9px }
+.monthly-simulation legend { padding-inline: 4px; font-size: 12px; font-weight: 650 }
+.monthly-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 235px), 1fr)); gap: 8px; margin: 12px 0 }
+.monthly-card { border: 1px solid var(--line); padding: 10px; border-radius: 8px; min-width: 0 }
+.monthly-card h4 { font-size: 13px; font-weight: 650; margin-bottom: 6px }
+.monthly-card dl > div, .monthly-items li { display: flex; justify-content: space-between; gap: 8px; font-size: 12px }
+.monthly-card dt { color: var(--muted) }
+.monthly-card dd, .monthly-items li span:last-child { flex: none; font-variant-numeric: tabular-nums }
+.monthly-card p { margin-top: 4px }
+.monthly-card .month-balance { color: #65dc94 }
+.monthly-card .purchase-urgent { color: #f5bb75 }
+.monthly-items { border-top: 1px solid var(--line); margin-top: 7px; padding-top: 5px; display: grid; gap: 4px; overflow-wrap: anywhere }
 @media (max-width: 420px) {
   .spending-totals { grid-template-columns: 1fr }
 }
