@@ -5,6 +5,7 @@ import {Button,Input,Modal,Tooltip,TooltipProvider,Badge,Empty,Progress,Tabs,Sel
 import '@fontsource-variable/inter'
 import {freshSetup,loadSetup,storeSetup} from './setup-data'
 import GamesCarousel,{loadGames} from './games-carousel'
+import { AssemblyChecklist, OfferRadar } from './setup-panels'
 import CloudGate from './cloud-gate'
 import {supabase} from './cloud'
 import ImageAttachment,{resolveImageAttachment} from './image-attachment'
@@ -205,6 +206,11 @@ function App({cloud}){
      </div>:parts.length>0&&<p>Todas as peças foram compradas.</p>}
     </article>
    </section>
+   <div className="setup-panels">
+    <OfferRadar parts={pendingParts} readRadar={cloud?.readRadar}/>
+    <AssemblyChecklist value={data.assemblyChecklist} saving={savingSetup}
+     onChange={assemblyChecklist=>persistSetup({...data,assemblyChecklist})}/>
+   </div>
    <GamesCarousel cloud={cloud}/>
    <footer>{(storageError||cloud?.accountError)&&<div role="alert" data-slot="alert">{storageError||cloud.accountError}</div>}
     <div className="footer-storage"><span>{cloud?'Salvamento no espaço compartilhado.':'Dados salvos neste navegador.'}</span>

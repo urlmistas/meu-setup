@@ -33,6 +33,11 @@ export async function openCloudSetup(accessKey) {
     games:data.games,
     saveSetup:value=>save('setup',value),
     saveGames:value=>save('games',value),
+    async readRadar() {
+      const {data,error}=await supabase.rpc('unisetup_read_radar',{p_key:accessKey})
+      if (error) throw error
+      return data
+    },
     async importBackup(backup) {
       const {revision}=await call('import',backup)
       revisions.setup=revisions.games=revision
